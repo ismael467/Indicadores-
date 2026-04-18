@@ -14,116 +14,60 @@
     --green: #3dffa0;
     --red: #ff4d6d;
     --blue: #5b8dee;
+    --orange: #ff9f43;
     --text: #e8e8f0;
     --muted: #555570;
   }
-
   * { margin: 0; padding: 0; box-sizing: border-box; }
-
   body {
-    background: var(--bg);
-    color: var(--text);
+    background: var(--bg); color: var(--text);
     font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
+    min-height: 100vh; display: flex;
+    align-items: flex-start; justify-content: center;
     padding: 28px 16px;
   }
-
   .container { width: 100%; max-width: 420px; }
-
-  h1 {
-    font-size: 11px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 28px;
-    font-family: 'Space Mono', monospace;
-  }
+  h1 { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 28px; font-family: 'Space Mono', monospace; }
   h1 span { color: var(--yellow); }
-
   .search-box { display: flex; gap: 10px; margin-bottom: 16px; }
-
   input {
-    flex: 1;
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--text);
-    padding: 14px 18px;
-    font-family: 'Space Mono', monospace;
-    font-size: 16px;
-    text-transform: uppercase;
-    outline: none;
-    border-radius: 4px;
-    transition: border-color 0.2s;
-    letter-spacing: 2px;
+    flex: 1; background: var(--card); border: 1px solid var(--border);
+    color: var(--text); padding: 14px 18px; font-family: 'Space Mono', monospace;
+    font-size: 16px; text-transform: uppercase; outline: none; border-radius: 4px;
+    transition: border-color 0.2s; letter-spacing: 2px;
   }
   input:focus { border-color: var(--yellow); }
   input::placeholder { color: var(--muted); font-size: 12px; letter-spacing: 1px; }
-
   button {
-    background: var(--yellow);
-    color: #0a0a0f;
-    border: none;
-    padding: 14px 20px;
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 13px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: opacity 0.2s;
+    background: var(--yellow); color: #0a0a0f; border: none;
+    padding: 14px 20px; font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 13px; cursor: pointer; border-radius: 4px; transition: opacity 0.2s;
   }
   button:hover { opacity: 0.85; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
-
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
   .chip {
-    background: var(--card);
-    border: 1px solid var(--border);
-    color: var(--muted);
-    padding: 6px 14px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    cursor: pointer;
-    border-radius: 20px;
-    transition: all 0.2s;
-    letter-spacing: 1px;
+    background: var(--card); border: 1px solid var(--border); color: var(--muted);
+    padding: 6px 14px; font-family: 'Space Mono', monospace; font-size: 11px;
+    cursor: pointer; border-radius: 20px; transition: all 0.2s; letter-spacing: 1px;
   }
   .chip:hover { border-color: var(--yellow); color: var(--yellow); }
-
-  .loading {
-    text-align: center; padding: 40px; color: var(--muted);
-    font-family: 'Space Mono', monospace; font-size: 12px;
-    display: none; letter-spacing: 2px;
-  }
+  .loading { text-align: center; padding: 40px; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 12px; display: none; letter-spacing: 2px; }
   .loading.visible { display: block; }
   .dot { animation: blink 1s infinite; }
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
   @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
-
-  .error {
-    background: rgba(255,77,109,0.1);
-    border: 1px solid rgba(255,77,109,0.3);
-    color: var(--red); padding: 16px 20px; border-radius: 6px;
-    font-family: 'Space Mono', monospace; font-size: 12px; display: none;
-  }
+  .error { background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.3); color: var(--red); padding: 16px 20px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 12px; display: none; }
   .error.visible { display: block; }
-
   .result { display: none; animation: fadeIn 0.3s ease; }
   .result.visible { display: block; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
 
-  /* Price card */
-  .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 24px;
-    margin-bottom: 14px;
-  }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 14px; }
+  .section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 18px; }
 
+  /* Precio */
   .coin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
   .coin-name { font-size: 20px; font-weight: 800; }
   .coin-symbol { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-top: 3px; }
@@ -132,103 +76,56 @@
   .change { font-family: 'Space Mono', monospace; font-size: 12px; }
   .change.up { color: var(--green); }
   .change.down { color: var(--red); }
-
   .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
   .mini-stat { background: var(--bg); border-radius: 6px; padding: 12px; }
   .mini-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; font-family: 'Space Mono', monospace; }
   .mini-value { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; }
 
-  /* RSI card */
-  .section-title {
-    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
-    color: var(--muted); font-family: 'Space Mono', monospace;
-    margin-bottom: 18px;
-  }
-
-  .rsi-number {
-    font-family: 'Space Mono', monospace;
-    font-size: 48px;
-    font-weight: 700;
-    text-align: center;
-    margin-bottom: 6px;
-  }
+  /* RSI */
+  .rsi-number { font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700; text-align: center; margin-bottom: 6px; }
   .rsi-number.sobrevendido { color: var(--green); }
-  .rsi-number.neutro       { color: var(--yellow); }
-  .rsi-number.sobrecomprado{ color: var(--red); }
-
-  .rsi-label {
-    text-align: center;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    text-transform: uppercase;
-  }
+  .rsi-number.neutro { color: var(--yellow); }
+  .rsi-number.sobrecomprado { color: var(--red); }
+  .rsi-label { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase; }
   .rsi-label.sobrevendido { color: var(--green); }
-  .rsi-label.neutro       { color: var(--yellow); }
-  .rsi-label.sobrecomprado{ color: var(--red); }
+  .rsi-label.neutro { color: var(--yellow); }
+  .rsi-label.sobrecomprado { color: var(--red); }
+  .rsi-bar-wrap { position: relative; height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--green) 0%, var(--green) 30%, var(--yellow) 30%, var(--yellow) 70%, var(--red) 70%, var(--red) 100%); margin-bottom: 6px; }
+  .rsi-cursor { position: absolute; top: -4px; width: 16px; height: 16px; border-radius: 50%; background: white; border: 3px solid var(--bg); transform: translateX(-50%); transition: left 0.5s ease; }
+  .rsi-ticks { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 6px; }
+  .signal-box { margin-top: 16px; background: var(--bg); border-radius: 6px; padding: 14px 16px; font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.7; color: var(--text); }
+  .signal-box strong { color: var(--yellow); }
 
-  /* RSI bar */
-  .rsi-bar-wrap {
-    position: relative;
-    height: 8px;
-    border-radius: 4px;
-    background: linear-gradient(to right, var(--green) 0%, var(--green) 30%, var(--yellow) 30%, var(--yellow) 70%, var(--red) 70%, var(--red) 100%);
-    margin-bottom: 6px;
-  }
-  .rsi-cursor {
-    position: absolute;
-    top: -4px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: white;
-    border: 3px solid var(--bg);
-    transform: translateX(-50%);
-    transition: left 0.5s ease;
-  }
-  .rsi-ticks {
-    display: flex;
-    justify-content: space-between;
-    font-family: 'Space Mono', monospace;
-    font-size: 9px;
-    color: var(--muted);
-    margin-top: 6px;
-  }
-
-  .rsi-signal {
-    margin-top: 18px;
+  /* MACD + EMA */
+  .indicator-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px; border-radius: 6px; margin-bottom: 10px;
     background: var(--bg);
-    border-radius: 6px;
-    padding: 14px 16px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    line-height: 1.7;
-    color: var(--text);
   }
-  .rsi-signal strong { color: var(--yellow); }
+  .ind-left { display: flex; align-items: center; gap: 12px; }
+  .ind-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+  .ind-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .ind-dot.red { background: var(--red); box-shadow: 0 0 6px var(--red); }
+  .ind-dot.yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
+  .ind-name { font-size: 12px; font-weight: 700; }
+  .ind-desc { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
+  .ind-value { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; text-align: right; }
+  .ind-signal { font-size: 10px; font-family: 'Space Mono', monospace; text-align: right; margin-top: 2px; }
+  .ind-signal.green { color: var(--green); }
+  .ind-signal.red { color: var(--red); }
+  .ind-signal.yellow { color: var(--yellow); }
 
-  /* DCA levels */
-  .level-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 14px;
-    border-radius: 6px;
-    margin-bottom: 8px;
-    border-left: 3px solid transparent;
-  }
+  /* DCA */
+  .level-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid transparent; }
   .level-label { font-size: 12px; font-weight: 700; }
   .level-sub { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
   .level-price { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; text-align: right; }
   .level-pct { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; text-align: right; margin-top: 2px; }
-
-  .lvl-dca1 { background: rgba(93,141,238,0.08);  border-left-color: var(--blue); }
-  .lvl-dca2 { background: rgba(93,141,238,0.05);  border-left-color: #4a7bd4; }
-  .lvl-dca3 { background: rgba(93,141,238,0.03);  border-left-color: #3a6bc4; }
-  .lvl-tp   { background: rgba(61,255,160,0.08);  border-left-color: var(--green); }
-  .lvl-sl   { background: rgba(255,77,109,0.08);  border-left-color: var(--red); }
-
+  .lvl-dca1 { background: rgba(93,141,238,0.08); border-left-color: var(--blue); }
+  .lvl-dca2 { background: rgba(93,141,238,0.05); border-left-color: #4a7bd4; }
+  .lvl-dca3 { background: rgba(93,141,238,0.03); border-left-color: #3a6bc4; }
+  .lvl-tp { background: rgba(61,255,160,0.08); border-left-color: var(--green); }
+  .lvl-sl { background: rgba(255,77,109,0.08); border-left-color: var(--red); }
   .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
 
   .updated { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; text-align: right; }
@@ -278,22 +175,54 @@
 
     <!-- RSI -->
     <div class="card">
-      <div class="section-title">◈ RSI — Temporalidad 4H</div>
+      <div class="section-title">◈ RSI — 4H · 14 periodos</div>
       <div class="rsi-number" id="rsi-num">—</div>
       <div class="rsi-label" id="rsi-label">—</div>
       <div class="rsi-bar-wrap">
         <div class="rsi-cursor" id="rsi-cursor" style="left:50%"></div>
       </div>
-      <div class="rsi-ticks">
-        <span>0</span><span>30</span><span>70</span><span>100</span>
+      <div class="rsi-ticks"><span>0</span><span>30</span><span>70</span><span>100</span></div>
+      <div class="signal-box" id="rsi-signal">—</div>
+    </div>
+
+    <!-- MACD + EMA21 -->
+    <div class="card">
+      <div class="section-title">◈ MACD + EMA 21 — 4H</div>
+
+      <div class="indicator-row">
+        <div class="ind-left">
+          <div class="ind-dot" id="ema-dot"></div>
+          <div>
+            <div class="ind-name">EMA 21</div>
+            <div class="ind-desc">Media exponencial 21 periodos</div>
+          </div>
+        </div>
+        <div>
+          <div class="ind-value" id="ema-val">—</div>
+          <div class="ind-signal" id="ema-sig">—</div>
+        </div>
       </div>
-      <div class="rsi-signal" id="rsi-signal">—</div>
+
+      <div class="indicator-row">
+        <div class="ind-left">
+          <div class="ind-dot" id="macd-dot"></div>
+          <div>
+            <div class="ind-name">MACD</div>
+            <div class="ind-desc">12/26/9 · Línea y señal</div>
+          </div>
+        </div>
+        <div>
+          <div class="ind-value" id="macd-val">—</div>
+          <div class="ind-signal" id="macd-sig">—</div>
+        </div>
+      </div>
+
+      <div class="signal-box" id="macd-explain">—</div>
     </div>
 
     <!-- Niveles DCA -->
     <div class="card">
       <div class="section-title">◈ Niveles de Entrada</div>
-
       <div class="level-row lvl-dca1">
         <div><div class="level-label">DCA 1</div><div class="level-sub">1ª zona de compra</div></div>
         <div><div class="level-price" id="l-dca1">—</div><div class="level-pct" id="p-dca1">—</div></div>
@@ -306,9 +235,7 @@
         <div><div class="level-label">DCA 3</div><div class="level-sub">3ª zona de compra</div></div>
         <div><div class="level-price" id="l-dca3">—</div><div class="level-pct" id="p-dca3">—</div></div>
       </div>
-
       <hr class="divider">
-
       <div class="level-row lvl-tp">
         <div><div class="level-label">Take Profit</div><div class="level-sub">Objetivo de ganancia</div></div>
         <div><div class="level-price" id="l-tp">—</div><div class="level-pct" id="p-tp">—</div></div>
@@ -340,112 +267,110 @@ function fmt(n) {
   if (n >= 1) return '$' + n.toFixed(2);
   return '$' + n.toFixed(6);
 }
-
 function pct(from, to) {
   const p = ((to - from) / from) * 100;
   return (p >= 0 ? '+' : '') + p.toFixed(1) + '%';
 }
-
 function show(id) {
   ['loading','error','result'].forEach(x => document.getElementById(x).classList.remove('visible'));
   document.getElementById(id).classList.add('visible');
 }
 
-// Calcula RSI con el método Wilder (14 periodos)
+// ── RSI (Wilder, 14 periodos) ──
 function calcRSI(prices, period = 14) {
   if (prices.length < period + 1) return null;
   let gains = 0, losses = 0;
   for (let i = 1; i <= period; i++) {
-    const diff = prices[i] - prices[i - 1];
-    if (diff >= 0) gains += diff;
-    else losses -= diff;
+    const d = prices[i] - prices[i-1];
+    if (d >= 0) gains += d; else losses -= d;
   }
-  let avgGain = gains / period;
-  let avgLoss = losses / period;
+  let ag = gains / period, al = losses / period;
   for (let i = period + 1; i < prices.length; i++) {
-    const diff = prices[i] - prices[i - 1];
-    const g = diff >= 0 ? diff : 0;
-    const l = diff < 0 ? -diff : 0;
-    avgGain = (avgGain * (period - 1) + g) / period;
-    avgLoss = (avgLoss * (period - 1) + l) / period;
+    const d = prices[i] - prices[i-1];
+    ag = (ag * (period-1) + Math.max(d,0)) / period;
+    al = (al * (period-1) + Math.max(-d,0)) / period;
   }
-  if (avgLoss === 0) return 100;
-  const rs = avgGain / avgLoss;
-  return 100 - (100 / (1 + rs));
+  if (al === 0) return 100;
+  return 100 - (100 / (1 + ag/al));
+}
+
+// ── EMA ──
+function calcEMA(prices, period) {
+  if (prices.length < period) return null;
+  const k = 2 / (period + 1);
+  let ema = prices.slice(0, period).reduce((a,b) => a+b, 0) / period;
+  for (let i = period; i < prices.length; i++) {
+    ema = prices[i] * k + ema * (1 - k);
+  }
+  return ema;
+}
+
+// ── MACD (12, 26, 9) ──
+function calcMACD(prices) {
+  if (prices.length < 35) return null;
+  const ema12 = calcEMA(prices, 12);
+  const ema26 = calcEMA(prices, 26);
+  if (!ema12 || !ema26) return null;
+  const macdLine = ema12 - ema26;
+
+  // Calcular línea MACD histórica para la señal (9 periodos EMA del MACD)
+  const macdHistory = [];
+  for (let i = 26; i <= prices.length; i++) {
+    const e12 = calcEMA(prices.slice(0, i), 12);
+    const e26 = calcEMA(prices.slice(0, i), 26);
+    if (e12 && e26) macdHistory.push(e12 - e26);
+  }
+  const signal = calcEMA(macdHistory, 9);
+  const histogram = macdLine - (signal || 0);
+  return { macdLine, signal, histogram };
 }
 
 function getRsiInfo(rsi) {
-  if (rsi <= 30) return {
-    clase: 'sobrevendido',
-    label: 'Sobrevendido',
-    signal: `RSI en zona de <strong>sobrevendido</strong>. El precio ha caído mucho y puede haber rebote. Buena zona para considerar entradas DCA.`
-  };
-  if (rsi <= 45) return {
-    clase: 'sobrevendido',
-    label: 'Debilidad',
-    signal: `RSI en zona de <strong>debilidad</strong>. El mercado está bajista pero aún no en mínimos extremos. DCA 1 puede ser interesante.`
-  };
-  if (rsi <= 55) return {
-    clase: 'neutro',
-    label: 'Neutro',
-    signal: `RSI en zona <strong>neutral</strong>. Sin señal clara de compra ni venta. Esperar movimiento antes de entrar.`
-  };
-  if (rsi <= 70) return {
-    clase: 'neutro',
-    label: 'Fuerza',
-    signal: `RSI en zona de <strong>fuerza</strong>. El mercado sube con momentum. Cuidado con entrar tarde. Gestiona bien el riesgo.`
-  };
-  return {
-    clase: 'sobrecomprado',
-    label: 'Sobrecomprado',
-    signal: `RSI en zona de <strong>sobrecomprado</strong>. El precio ha subido mucho. <strong>No es buen momento para comprar.</strong> Esperar corrección.`
-  };
+  if (rsi <= 30) return { clase: 'sobrevendido', label: 'Sobrevendido', signal: `RSI en zona de <strong>sobrevendido</strong>. El precio ha caído mucho. Posible rebote. Buena zona para DCA.` };
+  if (rsi <= 45) return { clase: 'sobrevendido', label: 'Debilidad', signal: `RSI en zona de <strong>debilidad</strong>. Mercado bajista pero sin llegar a extremos. DCA 1 puede ser interesante.` };
+  if (rsi <= 55) return { clase: 'neutro', label: 'Neutro', signal: `RSI en zona <strong>neutral</strong>. Sin señal clara. Espera confirmación antes de entrar.` };
+  if (rsi <= 70) return { clase: 'neutro', label: 'Fuerza', signal: `RSI en zona de <strong>fuerza</strong>. Momentum alcista. Cuidado con entrar tarde en el movimiento.` };
+  return { clase: 'sobrecomprado', label: 'Sobrecomprado', signal: `RSI en zona de <strong>sobrecomprado</strong>. Precio muy alto. <strong>No es buen momento de compra.</strong> Espera corrección.` };
 }
 
-// Los niveles DCA ahora se ajustan según el RSI
 function calcLevels(price, rsi) {
-  // Cuanto más sobrevendido, más cerca están los niveles (el precio ya bajó)
-  const factor = rsi <= 30 ? 0.92 : rsi <= 50 ? 0.88 : 0.85;
+  const f = rsi <= 30 ? 0.92 : rsi <= 50 ? 0.88 : 0.85;
   return {
-    dca1: price * factor,
-    dca2: price * factor * 0.88,
-    dca3: price * factor * 0.76,
+    dca1: price * f,
+    dca2: price * f * 0.88,
+    dca3: price * f * 0.76,
     tp:   price * (rsi <= 40 ? 1.25 : 1.18),
     sl:   price * (rsi <= 40 ? 0.82 : 0.80)
   };
 }
 
 async function buscarDirecto(coinId) { await fetchCoin(coinId); }
-
 async function buscar() {
   const raw = document.getElementById('ticker').value.trim().toUpperCase();
   if (!raw) return;
-  const coinId = tickerToId[raw] || raw.toLowerCase();
-  await fetchCoin(coinId);
+  await fetchCoin(tickerToId[raw] || raw.toLowerCase());
 }
 
 async function fetchCoin(coinId) {
   document.getElementById('btn').disabled = true;
   show('loading');
   try {
-    // Petición 1: datos actuales
     const url1 = `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=false&developer_data=false`;
-    // Petición 2: histórico de 10 días en intervalos de 4h (hourly da datos cada hora, tomamos cada 4)
-    const url2 = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=10&interval=hourly`;
+    // 30 días de datos horarios para tener suficientes puntos para MACD y EMA
+    const url2 = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=30&interval=hourly`;
 
     const [r1, r2] = await Promise.all([fetch(url1), fetch(url2)]);
     if (!r1.ok || !r2.ok) throw new Error();
     const [d, hist] = await Promise.all([r1.json(), r2.json()]);
 
-    // Extraer precios de cierre cada 4 horas
     const allPrices = hist.prices.map(p => p[1]);
+    // Cada 4 horas
     const prices4h = allPrices.filter((_, i) => i % 4 === 0);
 
-    const rsi = calcRSI(prices4h);
-    const price = d.market_data.current_price.usd;
+    const price  = d.market_data.current_price.usd;
     const change = d.market_data.price_change_percentage_24h;
 
-    // Precio
+    // ── Precio ──
     document.getElementById('coin-name').textContent = d.name;
     document.getElementById('coin-symbol').textContent = d.symbol.toUpperCase();
     document.getElementById('coin-img').src = d.image.small;
@@ -458,9 +383,11 @@ async function fetchCoin(coinId) {
     document.getElementById('mcap').textContent = fmt(d.market_data.market_cap.usd);
     document.getElementById('vol').textContent  = fmt(d.market_data.total_volume.usd);
 
-    // RSI
+    // ── RSI ──
+    const rsi = calcRSI(prices4h);
+    let rsiVal = 50;
     if (rsi !== null) {
-      const rsiVal = Math.round(rsi * 10) / 10;
+      rsiVal = Math.round(rsi * 10) / 10;
       const info = getRsiInfo(rsiVal);
       const rsiNumEl = document.getElementById('rsi-num');
       rsiNumEl.textContent = rsiVal.toFixed(1);
@@ -470,24 +397,11 @@ async function fetchCoin(coinId) {
       rsiLabelEl.className = 'rsi-label ' + info.clase;
       document.getElementById('rsi-cursor').style.left = Math.min(Math.max(rsiVal, 2), 98) + '%';
       document.getElementById('rsi-signal').innerHTML = info.signal;
-
-      // Niveles ajustados por RSI
-      const lv = calcLevels(price, rsiVal);
-      [['dca1',lv.dca1],['dca2',lv.dca2],['dca3',lv.dca3],['tp',lv.tp],['sl',lv.sl]].forEach(([k,v]) => {
-        document.getElementById('l-'+k).textContent = fmt(v);
-        document.getElementById('p-'+k).textContent = pct(price, v);
-      });
     }
 
-    document.getElementById('updated').textContent = 'Actualizado: ' + new Date().toLocaleTimeString('es-ES');
-    show('result');
-  } catch(e) {
-    show('error');
-  }
-  document.getElementById('btn').disabled = false;
-}
-
-document.getElementById('ticker').addEventListener('keydown', e => { if(e.key==='Enter') buscar(); });
-</script>
-</body>
-</html>
+    // ── EMA 21 ──
+    const ema21 = calcEMA(prices4h, 21);
+    if (ema21 !== null) {
+      const aboveEMA = price > ema21;
+      document.getElementById('ema-val').textContent = fmt(ema21);
+      document.getElement
