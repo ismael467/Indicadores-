@@ -115,6 +115,24 @@
   .ind-signal.red { color: var(--red); }
   .ind-signal.yellow { color: var(--yellow); }
 
+  /* Bollinger Bands */
+  .bb-visual { display: flex; align-items: stretch; gap: 10px; margin-bottom: 14px; min-height: 90px; }
+  .bb-labels { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; min-width: 80px; }
+  .bb-tag { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
+  .bb-tag.mid { color: var(--yellow); }
+  .bb-track { flex: 1; position: relative; background: var(--bg); border-radius: 6px; overflow: hidden; }
+  .bb-band-area { position: absolute; left: 0; right: 0; background: rgba(91,141,238,0.12); border-top: 1px solid rgba(91,141,238,0.4); border-bottom: 1px solid rgba(91,141,238,0.4); }
+  .bb-price-marker {
+    position: absolute; left: 8px; right: 8px; height: 3px;
+    background: var(--yellow); border-radius: 2px;
+    box-shadow: 0 0 8px var(--yellow);
+    transition: top 0.4s ease;
+  }
+  .bb-side-labels { display: flex; flex-direction: column; justify-content: space-between; min-width: 50px; }
+  .bb-side-labels span { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
+  .bb-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .bb-stat { background: var(--bg); border-radius: 6px; padding: 12px; }
+
   /* DCA */
   .level-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid transparent; }
   .level-label { font-size: 12px; font-weight: 700; }
@@ -218,6 +236,41 @@
       </div>
 
       <div class="signal-box" id="macd-explain">—</div>
+    </div>
+
+    <!-- Bollinger Bands -->
+    <div class="card">
+      <div class="section-title">◈ Bandas de Bollinger — 4H · 20 periodos</div>
+
+      <div class="bb-visual">
+        <div class="bb-labels">
+          <span class="bb-tag" id="bb-upper-tag">—</span>
+          <span class="bb-tag mid" id="bb-mid-tag">—</span>
+          <span class="bb-tag" id="bb-lower-tag">—</span>
+        </div>
+        <div class="bb-track">
+          <div class="bb-band-area" id="bb-area"></div>
+          <div class="bb-price-marker" id="bb-marker"></div>
+        </div>
+        <div class="bb-side-labels">
+          <span>Superior</span>
+          <span>Media</span>
+          <span>Inferior</span>
+        </div>
+      </div>
+
+      <div class="bb-stats">
+        <div class="bb-stat">
+          <div class="mini-label">%B (posición)</div>
+          <div class="mini-value" id="bb-pct">—</div>
+        </div>
+        <div class="bb-stat">
+          <div class="mini-label">Anchura</div>
+          <div class="mini-value" id="bb-width">—</div>
+        </div>
+      </div>
+
+      <div class="signal-box" id="bb-signal">—</div>
     </div>
 
     <!-- Niveles DCA -->
@@ -325,6 +378,16 @@ function calcMACD(prices) {
   return { macdLine, signal, histogram };
 }
 
+// ── Bollinger Bands (20 periodos, 2 desviaciones) ──
+function calcBB(prices, period = 20, mult = 2) {
+  if (prices.length < period) return null;
+  const slice = prices.slice(-period);
+  const mid = slice.reduce((a,b) => a+b, 0) / period;
+  const variance = slice.reduce((a,b) => a + Math.pow(b - mid, 2), 0) / period;
+  const std = Math.sqrt(variance);
+  return { upper: mid + mult*std, mid, lower: mid - mult*std, std };
+}
+
 function getRsiInfo(rsi) {
   if (rsi <= 30) return { clase: 'sobrevendido', label: 'Sobrevendido', signal: `RSI en zona de <strong>sobrevendido</strong>. El precio ha caído mucho. Posible rebote. Buena zona para DCA.` };
   if (rsi <= 45) return { clase: 'sobrevendido', label: 'Debilidad', signal: `RSI en zona de <strong>debilidad</strong>. Mercado bajista pero sin llegar a extremos. DCA 1 puede ser interesante.` };
@@ -344,64 +407,4 @@ function calcLevels(price, rsi) {
   };
 }
 
-async function buscarDirecto(coinId) { await fetchCoin(coinId); }
-async function buscar() {
-  const raw = document.getElementById('ticker').value.trim().toUpperCase();
-  if (!raw) return;
-  await fetchCoin(tickerToId[raw] || raw.toLowerCase());
-}
-
-async function fetchCoin(coinId) {
-  document.getElementById('btn').disabled = true;
-  show('loading');
-  try {
-    const url1 = `https://api.coingecko.com/api/v3/coins/${coinId}?localization=false&tickers=false&community_data=false&developer_data=false`;
-    // 30 días de datos horarios para tener suficientes puntos para MACD y EMA
-    const url2 = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart?vs_currency=usd&days=30&interval=hourly`;
-
-    const [r1, r2] = await Promise.all([fetch(url1), fetch(url2)]);
-    if (!r1.ok || !r2.ok) throw new Error();
-    const [d, hist] = await Promise.all([r1.json(), r2.json()]);
-
-    const allPrices = hist.prices.map(p => p[1]);
-    // Cada 4 horas
-    const prices4h = allPrices.filter((_, i) => i % 4 === 0);
-
-    const price  = d.market_data.current_price.usd;
-    const change = d.market_data.price_change_percentage_24h;
-
-    // ── Precio ──
-    document.getElementById('coin-name').textContent = d.name;
-    document.getElementById('coin-symbol').textContent = d.symbol.toUpperCase();
-    document.getElementById('coin-img').src = d.image.small;
-    document.getElementById('price').textContent = fmt(price);
-    const changeEl = document.getElementById('change');
-    changeEl.textContent = `${change >= 0 ? '+' : ''}${change.toFixed(2)}% últimas 24h`;
-    changeEl.className = 'change ' + (change >= 0 ? 'up' : 'down');
-    document.getElementById('high').textContent = fmt(d.market_data.high_24h.usd);
-    document.getElementById('low').textContent  = fmt(d.market_data.low_24h.usd);
-    document.getElementById('mcap').textContent = fmt(d.market_data.market_cap.usd);
-    document.getElementById('vol').textContent  = fmt(d.market_data.total_volume.usd);
-
-    // ── RSI ──
-    const rsi = calcRSI(prices4h);
-    let rsiVal = 50;
-    if (rsi !== null) {
-      rsiVal = Math.round(rsi * 10) / 10;
-      const info = getRsiInfo(rsiVal);
-      const rsiNumEl = document.getElementById('rsi-num');
-      rsiNumEl.textContent = rsiVal.toFixed(1);
-      rsiNumEl.className = 'rsi-number ' + info.clase;
-      const rsiLabelEl = document.getElementById('rsi-label');
-      rsiLabelEl.textContent = info.label;
-      rsiLabelEl.className = 'rsi-label ' + info.clase;
-      document.getElementById('rsi-cursor').style.left = Math.min(Math.max(rsiVal, 2), 98) + '%';
-      document.getElementById('rsi-signal').innerHTML = info.signal;
-    }
-
-    // ── EMA 21 ──
-    const ema21 = calcEMA(prices4h, 21);
-    if (ema21 !== null) {
-      const aboveEMA = price > ema21;
-      document.getElementById('ema-val').textContent = fmt(ema21);
-      document.getElement
+async function buscarDirecto(coinId
