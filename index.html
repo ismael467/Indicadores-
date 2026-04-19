@@ -1,353 +1,341 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cripto Indicador</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0a0f; --card: #12121a; --border: #1e1e2e;
-    --yellow: #f5c842; --green: #3dffa0; --red: #ff4d6d;
-    --blue: #5b8dee; --text: #e8e8f0; --muted: #555570;
-  }
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 28px 16px; }
-  .container { width: 100%; max-width: 420px; }
-  h1 { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 28px; font-family: 'Space Mono', monospace; }
-  h1 span { color: var(--yellow); }
-  .search-box { display: flex; gap: 10px; margin-bottom: 16px; }
-  input { flex: 1; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 14px 18px; font-family: 'Space Mono', monospace; font-size: 16px; text-transform: uppercase; outline: none; border-radius: 4px; transition: border-color 0.2s; letter-spacing: 2px; }
-  input:focus { border-color: var(--yellow); }
-  input::placeholder { color: var(--muted); font-size: 12px; letter-spacing: 1px; }
-  button { background: var(--yellow); color: #0a0a0f; border: none; padding: 14px 20px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; cursor: pointer; border-radius: 4px; transition: opacity 0.2s; }
-  button:hover { opacity: 0.85; }
-  button:disabled { opacity: 0.4; cursor: not-allowed; }
-  .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
-  .chip { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer; border-radius: 20px; transition: all 0.2s; letter-spacing: 1px; }
-  .chip:hover { border-color: var(--yellow); color: var(--yellow); }
-  .loading { text-align: center; padding: 40px; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 12px; display: none; letter-spacing: 2px; }
-  .loading.visible { display: block; }
-  .dot { animation: blink 1s infinite; }
-  .dot:nth-child(2) { animation-delay: 0.2s; }
-  .dot:nth-child(3) { animation-delay: 0.4s; }
-  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
-  .error { background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.3); color: var(--red); padding: 16px 20px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 12px; display: none; line-height: 1.6; }
-  .error.visible { display: block; }
-  .result { display: none; animation: fadeIn 0.3s ease; }
-  .result.visible { display: block; }
-  @keyframes fadeIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+import { useState, useCallback } from "react";
 
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: 8px; padding: 24px; margin-bottom: 14px; }
-  .section-title { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted); font-family: 'Space Mono', monospace; margin-bottom: 18px; }
-
-  /* Precio */
-  .coin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-  .coin-name { font-size: 20px; font-weight: 800; }
-  .coin-symbol { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-top: 3px; }
-  .price-big { font-family: 'Space Mono', monospace; font-size: 30px; font-weight: 700; color: var(--yellow); margin-bottom: 6px; }
-  .change { font-family: 'Space Mono', monospace; font-size: 12px; }
-  .change.up { color: var(--green); }
-  .change.down { color: var(--red); }
-  .mini-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 18px; }
-  .mini-stat { background: var(--bg); border-radius: 6px; padding: 12px; }
-  .mini-label { font-size: 9px; letter-spacing: 2px; color: var(--muted); text-transform: uppercase; margin-bottom: 5px; font-family: 'Space Mono', monospace; }
-  .mini-value { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; }
-
-  /* RSI */
-  .rsi-number { font-family: 'Space Mono', monospace; font-size: 48px; font-weight: 700; text-align: center; margin-bottom: 6px; }
-  .rsi-number.sobrevendido { color: var(--green); }
-  .rsi-number.neutro { color: var(--yellow); }
-  .rsi-number.sobrecomprado { color: var(--red); }
-  .rsi-label { text-align: center; font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 20px; text-transform: uppercase; }
-  .rsi-label.sobrevendido { color: var(--green); }
-  .rsi-label.neutro { color: var(--yellow); }
-  .rsi-label.sobrecomprado { color: var(--red); }
-  .rsi-bar-wrap { position: relative; height: 8px; border-radius: 4px; background: linear-gradient(to right, var(--green) 0%, var(--green) 30%, var(--yellow) 30%, var(--yellow) 70%, var(--red) 70%, var(--red) 100%); margin-bottom: 6px; }
-  .rsi-cursor { position: absolute; top: -4px; width: 16px; height: 16px; border-radius: 50%; background: white; border: 3px solid var(--bg); transform: translateX(-50%); transition: left 0.5s ease; }
-  .rsi-ticks { display: flex; justify-content: space-between; font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); margin-top: 6px; }
-  .signal-box { margin-top: 16px; background: var(--bg); border-radius: 6px; padding: 14px 16px; font-family: 'Space Mono', monospace; font-size: 11px; line-height: 1.7; color: var(--text); }
-  .signal-box strong { color: var(--yellow); }
-
-  /* MACD + EMA */
-  .indicator-row { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-radius: 6px; margin-bottom: 10px; background: var(--bg); }
-  .ind-left { display: flex; align-items: center; gap: 12px; }
-  .ind-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
-  .ind-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
-  .ind-dot.red { background: var(--red); box-shadow: 0 0 6px var(--red); }
-  .ind-dot.yellow { background: var(--yellow); box-shadow: 0 0 6px var(--yellow); }
-  .ind-name { font-size: 12px; font-weight: 700; }
-  .ind-desc { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
-  .ind-value { font-family: 'Space Mono', monospace; font-size: 12px; font-weight: 700; text-align: right; }
-  .ind-signal { font-size: 10px; font-family: 'Space Mono', monospace; text-align: right; margin-top: 2px; }
-  .ind-signal.green { color: var(--green); }
-  .ind-signal.red { color: var(--red); }
-  .ind-signal.yellow { color: var(--yellow); }
-
-  /* Bollinger */
-  .bb-visual { display: flex; align-items: stretch; gap: 10px; margin-bottom: 14px; min-height: 90px; }
-  .bb-labels { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; min-width: 80px; }
-  .bb-tag { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
-  .bb-tag.mid { color: var(--yellow); }
-  .bb-track { flex: 1; position: relative; background: var(--bg); border-radius: 6px; overflow: hidden; }
-  .bb-band-area { position: absolute; left: 0; right: 0; background: rgba(91,141,238,0.12); border-top: 1px solid rgba(91,141,238,0.4); border-bottom: 1px solid rgba(91,141,238,0.4); }
-  .bb-price-marker { position: absolute; left: 8px; right: 8px; height: 3px; background: var(--yellow); border-radius: 2px; box-shadow: 0 0 8px var(--yellow); transition: top 0.4s ease; }
-  .bb-side-labels { display: flex; flex-direction: column; justify-content: space-between; min-width: 50px; }
-  .bb-side-labels span { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
-  .bb-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-  .bb-stat { background: var(--bg); border-radius: 6px; padding: 12px; }
-
-  /* DCA */
-  .level-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-radius: 6px; margin-bottom: 8px; border-left: 3px solid transparent; }
-  .level-label { font-size: 12px; font-weight: 700; }
-  .level-sub { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; margin-top: 2px; }
-  .level-price { font-family: 'Space Mono', monospace; font-size: 13px; font-weight: 700; text-align: right; }
-  .level-pct { font-size: 10px; color: var(--muted); font-family: 'Space Mono', monospace; text-align: right; margin-top: 2px; }
-  .lvl-dca1 { background: rgba(93,141,238,0.08); border-left-color: var(--blue); }
-  .lvl-dca2 { background: rgba(93,141,238,0.05); border-left-color: #4a7bd4; }
-  .lvl-dca3 { background: rgba(93,141,238,0.03); border-left-color: #3a6bc4; }
-  .lvl-tp { background: rgba(61,255,160,0.08); border-left-color: var(--green); }
-  .lvl-sl { background: rgba(255,77,109,0.08); border-left-color: var(--red); }
-  .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
-  .updated { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; text-align: right; }
-  .note { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-align: center; margin-top: 10px; line-height: 1.6; padding-bottom: 20px; }
-</style>
-</head>
-<body>
-<div class="container">
-  <h1>◈ Cripto <span>Indicador</span></h1>
-
-  <div class="search-box">
-    <input type="text" id="ticker" placeholder="BTC, ETH, SOL..." maxlength="10" />
-    <button id="btn" onclick="buscar()">BUSCAR</button>
-  </div>
-
-  <div class="chips">
-    <div class="chip" onclick="buscarSimbolo('BTCUSDT')">BTC</div>
-    <div class="chip" onclick="buscarSimbolo('ETHUSDT')">ETH</div>
-    <div class="chip" onclick="buscarSimbolo('SOLUSDT')">SOL</div>
-    <div class="chip" onclick="buscarSimbolo('ADAUSDT')">ADA</div>
-    <div class="chip" onclick="buscarSimbolo('XRPUSDT')">XRP</div>
-  </div>
-
-  <div class="loading" id="loading">BUSCANDO<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
-  <div class="error" id="error">⚠ Cripto no encontrada. Prueba con BTC, ETH, SOL...</div>
-
-  <div class="result" id="result">
-
-    <!-- Precio -->
-    <div class="card">
-      <div class="coin-header">
-        <div>
-          <div class="coin-name" id="coin-name">—</div>
-          <div class="coin-symbol" id="coin-symbol">—</div>
-        </div>
-      </div>
-      <div class="price-big" id="price">—</div>
-      <div class="change" id="change">—</div>
-      <div class="mini-stats">
-        <div class="mini-stat"><div class="mini-label">Máx 24h</div><div class="mini-value" id="high">—</div></div>
-        <div class="mini-stat"><div class="mini-label">Mín 24h</div><div class="mini-value" id="low">—</div></div>
-        <div class="mini-stat"><div class="mini-label">Volumen 24h</div><div class="mini-value" id="vol">—</div></div>
-        <div class="mini-stat"><div class="mini-label">Fuente</div><div class="mini-value" style="color:var(--muted);font-size:10px">Binance</div></div>
-      </div>
-    </div>
-
-    <!-- RSI -->
-    <div class="card">
-      <div class="section-title">◈ RSI — 4H · 14 periodos</div>
-      <div class="rsi-number" id="rsi-num">—</div>
-      <div class="rsi-label" id="rsi-label">—</div>
-      <div class="rsi-bar-wrap">
-        <div class="rsi-cursor" id="rsi-cursor" style="left:50%"></div>
-      </div>
-      <div class="rsi-ticks"><span>0</span><span>30</span><span>70</span><span>100</span></div>
-      <div class="signal-box" id="rsi-signal">—</div>
-    </div>
-
-    <!-- MACD + EMA21 -->
-    <div class="card">
-      <div class="section-title">◈ MACD + EMA 21 — 4H</div>
-      <div class="indicator-row">
-        <div class="ind-left">
-          <div class="ind-dot" id="ema-dot"></div>
-          <div><div class="ind-name">EMA 21</div><div class="ind-desc">Media exponencial 21 periodos</div></div>
-        </div>
-        <div><div class="ind-value" id="ema-val">—</div><div class="ind-signal" id="ema-sig">—</div></div>
-      </div>
-      <div class="indicator-row">
-        <div class="ind-left">
-          <div class="ind-dot" id="macd-dot"></div>
-          <div><div class="ind-name">MACD</div><div class="ind-desc">12/26/9 · Línea y señal</div></div>
-        </div>
-        <div><div class="ind-value" id="macd-val">—</div><div class="ind-signal" id="macd-sig">—</div></div>
-      </div>
-      <div class="signal-box" id="macd-explain">—</div>
-    </div>
-
-    <!-- Bollinger Bands -->
-    <div class="card">
-      <div class="section-title">◈ Bandas de Bollinger — 4H · 20 periodos</div>
-      <div class="bb-visual">
-        <div class="bb-labels">
-          <span class="bb-tag" id="bb-upper-tag">—</span>
-          <span class="bb-tag mid" id="bb-mid-tag">—</span>
-          <span class="bb-tag" id="bb-lower-tag">—</span>
-        </div>
-        <div class="bb-track">
-          <div class="bb-band-area" id="bb-area"></div>
-          <div class="bb-price-marker" id="bb-marker"></div>
-        </div>
-        <div class="bb-side-labels">
-          <span>Superior</span><span>Media</span><span>Inferior</span>
-        </div>
-      </div>
-      <div class="bb-stats">
-        <div class="bb-stat"><div class="mini-label">%B (posición)</div><div class="mini-value" id="bb-pct">—</div></div>
-        <div class="bb-stat"><div class="mini-label">Anchura</div><div class="mini-value" id="bb-width">—</div></div>
-      </div>
-      <div class="signal-box" id="bb-signal">—</div>
-    </div>
-
-    <!-- Niveles DCA -->
-    <div class="card">
-      <div class="section-title">◈ Niveles de Entrada</div>
-      <div class="level-row lvl-dca1">
-        <div><div class="level-label">DCA 1</div><div class="level-sub">1ª zona de compra</div></div>
-        <div><div class="level-price" id="l-dca1">—</div><div class="level-pct" id="p-dca1">—</div></div>
-      </div>
-      <div class="level-row lvl-dca2">
-        <div><div class="level-label">DCA 2</div><div class="level-sub">2ª zona de compra</div></div>
-        <div><div class="level-price" id="l-dca2">—</div><div class="level-pct" id="p-dca2">—</div></div>
-      </div>
-      <div class="level-row lvl-dca3">
-        <div><div class="level-label">DCA 3</div><div class="level-sub">3ª zona de compra</div></div>
-        <div><div class="level-price" id="l-dca3">—</div><div class="level-pct" id="p-dca3">—</div></div>
-      </div>
-      <hr class="divider">
-      <div class="level-row lvl-tp">
-        <div><div class="level-label">Take Profit</div><div class="level-sub">Objetivo de ganancia</div></div>
-        <div><div class="level-price" id="l-tp">—</div><div class="level-pct" id="p-tp">—</div></div>
-      </div>
-      <div class="level-row lvl-sl">
-        <div><div class="level-label">Stop Loss</div><div class="level-sub">Límite de pérdida</div></div>
-        <div><div class="level-price" id="l-sl">—</div><div class="level-pct" id="p-sl">—</div></div>
-      </div>
-    </div>
-
-    <div class="updated" id="updated"></div>
-    <div class="note">⚠ Solo informativo. No es consejo financiero.</div>
-  </div>
-</div>
-
-<script>
-const tickerToSymbol = {
-  'BTC':'BTCUSDT','ETH':'ETHUSDT','SOL':'SOLUSDT','ADA':'ADAUSDT',
-  'XRP':'XRPUSDT','BNB':'BNBUSDT','DOGE':'DOGEUSDT','DOT':'DOTUSDT',
-  'MATIC':'MATICUSDT','LINK':'LINKUSDT','AVAX':'AVAXUSDT',
-  'SHIB':'SHIBUSDT','LTC':'LTCUSDT','UNI':'UNIUSDT','ATOM':'ATOMUSDT',
-  'TRX':'TRXUSDT','TON':'TONUSDT','SUI':'SUIUSDT','APT':'APTUSDT','NEAR':'NEARUSDT'
-};
-const symbolToName = {
-  'BTCUSDT':'Bitcoin','ETHUSDT':'Ethereum','SOLUSDT':'Solana','ADAUSDT':'Cardano',
-  'XRPUSDT':'XRP','BNBUSDT':'BNB','DOGEUSDT':'Dogecoin','DOTUSDT':'Polkadot',
-  'MATICUSDT':'Polygon','LINKUSDT':'Chainlink','AVAXUSDT':'Avalanche',
-  'SHIBUSDT':'Shiba Inu','LTCUSDT':'Litecoin','UNIUSDT':'Uniswap','ATOMUSDT':'Cosmos',
-  'TRXUSDT':'TRON','TONUSDT':'TON','SUIUSDT':'Sui','APTUSDT':'Aptos','NEARUSDT':'NEAR'
+const TICKER_MAP = {
+  BTC: "bitcoin", ETH: "ethereum", SOL: "solana", ADA: "cardano",
+  XRP: "ripple", BNB: "binancecoin", DOGE: "dogecoin", DOT: "polkadot",
+  LINK: "chainlink", AVAX: "avalanche-2", LTC: "litecoin", ATOM: "cosmos",
+  NEAR: "near", TRX: "tron", UNI: "uniswap", SUI: "sui", APT: "aptos"
 };
 
 function fmt(n) {
-  if (n >= 1e9) return '$' + (n/1e9).toFixed(2) + 'B';
-  if (n >= 1e6) return '$' + (n/1e6).toFixed(2) + 'M';
-  if (n >= 1000) return '$' + n.toLocaleString('es-ES', {maximumFractionDigits: 0});
-  if (n >= 1) return '$' + n.toFixed(2);
-  return '$' + n.toFixed(6);
+  if (!n && n !== 0) return "—";
+  if (n >= 1e9) return "$" + (n / 1e9).toFixed(2) + "B";
+  if (n >= 1e6) return "$" + (n / 1e6).toFixed(2) + "M";
+  if (n >= 1000) return "$" + n.toLocaleString("es-ES", { maximumFractionDigits: 0 });
+  if (n >= 1) return "$" + n.toFixed(2);
+  return "$" + n.toFixed(6);
 }
 function pct(from, to) {
   const p = ((to - from) / from) * 100;
-  return (p >= 0 ? '+' : '') + p.toFixed(1) + '%';
-}
-function show(id) {
-  ['loading','error','result'].forEach(x => document.getElementById(x).classList.remove('visible'));
-  document.getElementById(id).classList.add('visible');
+  return (p >= 0 ? "+" : "") + p.toFixed(1) + "%";
 }
 
-// ── RSI Wilder 14 ──
-function calcRSI(closes, period = 14) {
-  if (closes.length < period + 1) return null;
+function calcRSI(prices, period = 14) {
+  if (prices.length < period + 1) return null;
   let gains = 0, losses = 0;
   for (let i = 1; i <= period; i++) {
-    const d = closes[i] - closes[i-1];
+    const d = prices[i] - prices[i - 1];
     if (d >= 0) gains += d; else losses -= d;
   }
   let ag = gains / period, al = losses / period;
-  for (let i = period + 1; i < closes.length; i++) {
-    const d = closes[i] - closes[i-1];
-    ag = (ag*(period-1) + Math.max(d,0)) / period;
-    al = (al*(period-1) + Math.max(-d,0)) / period;
+  for (let i = period + 1; i < prices.length; i++) {
+    const d = prices[i] - prices[i - 1];
+    ag = (ag * (period - 1) + Math.max(d, 0)) / period;
+    al = (al * (period - 1) + Math.max(-d, 0)) / period;
   }
   if (al === 0) return 100;
-  return 100 - (100 / (1 + ag/al));
+  return 100 - 100 / (1 + ag / al);
 }
 
-// ── EMA ──
 function calcEMA(prices, period) {
   if (prices.length < period) return null;
   const k = 2 / (period + 1);
-  let ema = prices.slice(0, period).reduce((a,b) => a+b, 0) / period;
-  for (let i = period; i < prices.length; i++) ema = prices[i]*k + ema*(1-k);
+  let ema = prices.slice(0, period).reduce((a, b) => a + b, 0) / period;
+  for (let i = period; i < prices.length; i++) ema = prices[i] * k + ema * (1 - k);
   return ema;
 }
 
-// ── MACD 12/26/9 ──
 function calcMACD(prices) {
   if (prices.length < 35) return null;
-  const macdHistory = [];
+  const hist = [];
   for (let i = 26; i <= prices.length; i++) {
-    const e12 = calcEMA(prices.slice(0,i), 12);
-    const e26 = calcEMA(prices.slice(0,i), 26);
-    if (e12 && e26) macdHistory.push(e12 - e26);
+    const e12 = calcEMA(prices.slice(0, i), 12);
+    const e26 = calcEMA(prices.slice(0, i), 26);
+    if (e12 && e26) hist.push(e12 - e26);
   }
-  const macdLine = macdHistory[macdHistory.length - 1];
-  const signal = calcEMA(macdHistory, 9);
-  return { macdLine, signal, histogram: macdLine - (signal||0) };
+  const macdLine = hist[hist.length - 1];
+  const signal = calcEMA(hist, 9);
+  return { macdLine, signal };
 }
 
-// ── Bollinger Bands 20/2 ──
-function calcBB(prices, period = 20, mult = 2) {
+function calcBB(prices, period = 20) {
   if (prices.length < period) return null;
   const slice = prices.slice(-period);
-  const mid = slice.reduce((a,b) => a+b, 0) / period;
-  const std = Math.sqrt(slice.reduce((a,b) => a + Math.pow(b-mid,2), 0) / period);
-  return { upper: mid+mult*std, mid, lower: mid-mult*std };
+  const mid = slice.reduce((a, b) => a + b, 0) / period;
+  const std = Math.sqrt(slice.reduce((a, b) => a + Math.pow(b - mid, 2), 0) / period);
+  return { upper: mid + 2 * std, mid, lower: mid - 2 * std };
 }
 
 function getRsiInfo(rsi) {
-  if (rsi <= 30) return { clase:'sobrevendido', label:'Sobrevendido', signal:`RSI en zona de <strong>sobrevendido</strong>. El precio ha caído mucho. Posible rebote. Buena zona para DCA.` };
-  if (rsi <= 45) return { clase:'sobrevendido', label:'Debilidad', signal:`RSI en zona de <strong>debilidad</strong>. Mercado bajista pero sin llegar a extremos. DCA 1 puede ser interesante.` };
-  if (rsi <= 55) return { clase:'neutro', label:'Neutro', signal:`RSI en zona <strong>neutral</strong>. Sin señal clara. Espera confirmación antes de entrar.` };
-  if (rsi <= 70) return { clase:'neutro', label:'Fuerza', signal:`RSI en zona de <strong>fuerza</strong>. Momentum alcista. Cuidado con entrar tarde.` };
-  return { clase:'sobrecomprado', label:'Sobrecomprado', signal:`RSI en zona de <strong>sobrecomprado</strong>. <strong>No es buen momento de compra.</strong> Espera corrección.` };
+  if (rsi <= 30) return { color: "#3dffa0", label: "Sobrevendido", text: "Zona de sobrevendido. Posible rebote. Buena zona para DCA." };
+  if (rsi <= 45) return { color: "#3dffa0", label: "Debilidad", text: "Mercado débil pero sin llegar a extremos. DCA 1 puede ser interesante." };
+  if (rsi <= 55) return { color: "#f5c842", label: "Neutro", text: "Sin señal clara. Espera confirmación antes de entrar." };
+  if (rsi <= 70) return { color: "#f5c842", label: "Fuerza", text: "Momentum alcista. Cuidado con entrar tarde en el movimiento." };
+  return { color: "#ff4d6d", label: "Sobrecomprado", text: "Precio muy alto. No es buen momento de compra. Espera corrección." };
 }
 
 function calcLevels(price, rsi) {
   const f = rsi <= 30 ? 0.92 : rsi <= 50 ? 0.88 : 0.85;
-  return { dca1:price*f, dca2:price*f*0.88, dca3:price*f*0.76, tp:price*(rsi<=40?1.25:1.18), sl:price*(rsi<=40?0.82:0.80) };
+  return {
+    dca1: price * f, dca2: price * f * 0.88, dca3: price * f * 0.76,
+    tp: price * (rsi <= 40 ? 1.25 : 1.18), sl: price * (rsi <= 40 ? 0.82 : 0.80)
+  };
 }
 
-async function buscarSimbolo(symbol) { await fetchCoin(symbol); }
-async function buscar() {
-  const raw = document.getElementById('ticker').value.trim().toUpperCase();
-  if (!raw) return;
-  const symbol = tickerToSymbol[raw] || (raw + 'USDT');
-  await fetchCoin(symbol);
+export default function CriptoIndicador() {
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [data, setData] = useState(null);
+
+  const fetchData = useCallback(async (coinId) => {
+    setLoading(true);
+    setError("");
+    setData(null);
+    try {
+      const prompt = `You are a crypto data API. Return ONLY a JSON object (no markdown, no explanation) with real current data for ${coinId} cryptocurrency from CoinGecko or similar source. Include:
+{
+  "name": "coin name",
+  "symbol": "SYMBOL",
+  "price": current_price_usd,
+  "change24h": percent_change_24h,
+  "high24h": high_price_usd,
+  "low24h": low_price_usd,
+  "marketCap": market_cap_usd,
+  "volume24h": volume_24h_usd,
+  "prices4h": [array of last 100 closing prices at 4h intervals, most recent last]
 }
+Use real current market data. Return only valid JSON.`;
 
-async function fetchCoin(symbol) {
-  document.getElementById('btn').disabled = true;
-  show('loading');
-  try {
-    const coin = symbol.replace('USDT','');
+      const res = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: prompt }]
+        })
+      });
+      const resp = await res.json();
+      const text = resp.content?.map(c => c.text || "").join("") || "";
+      const clean = text.replace(/```json|```/g, "").trim();
+      const d = JSON.parse(clean);
 
-    // Coinbase API - gratuita, sin API key, permite CORS
-    
+      const prices = d.prices4h || [];
+      const rsiVal = calcRSI(prices) || 50;
+      const ema21 = calcEMA(prices, 21);
+      const macd = calcMACD(prices);
+      const bb = calcBB(prices);
+      const levels = calcLevels(d.price, rsiVal);
+
+      setData({ ...d, rsi: rsiVal, ema21, macd, bb, levels });
+    } catch (e) {
+      setError("Error al cargar datos. Inténtalo de nuevo.");
+    }
+    setLoading(false);
+  }, []);
+
+  const buscar = useCallback(() => {
+    const raw = input.trim().toUpperCase();
+    if (!raw) return;
+    const coinId = TICKER_MAP[raw] || raw.toLowerCase();
+    fetchData(coinId);
+  }, [input, fetchData]);
+
+  const buscarDirecto = useCallback((coinId) => {
+    fetchData(coinId);
+  }, [fetchData]);
+
+  const s = { fontFamily: "'Courier New', monospace" };
+
+  return (
+    <div style={{ background: "#0a0a0f", minHeight: "100vh", padding: "24px 16px", display: "flex", justifyContent: "center" }}>
+      <div style={{ width: "100%", maxWidth: 420 }}>
+
+        {/* Header */}
+        <div style={{ fontSize: 11, letterSpacing: 4, textTransform: "uppercase", color: "#555570", marginBottom: 28, ...s }}>
+          ◈ Cripto <span style={{ color: "#f5c842" }}>Indicador</span>
+        </div>
+
+        {/* Search */}
+        <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+          <input
+            value={input}
+            onChange={e => setInput(e.target.value.toUpperCase())}
+            onKeyDown={e => e.key === "Enter" && buscar()}
+            placeholder="BTC, ETH, SOL..."
+            style={{ flex: 1, background: "#12121a", border: "1px solid #1e1e2e", color: "#e8e8f0", padding: "14px 18px", ...s, fontSize: 16, outline: "none", borderRadius: 4, letterSpacing: 2 }}
+          />
+          <button onClick={buscar} disabled={loading} style={{ background: "#f5c842", color: "#0a0a0f", border: "none", padding: "14px 20px", fontWeight: 800, fontSize: 13, cursor: "pointer", borderRadius: 4, fontFamily: "sans-serif" }}>
+            BUSCAR
+          </button>
+        </div>
+
+        {/* Quick chips */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
+          {["bitcoin", "ethereum", "solana", "cardano", "ripple"].map((id, i) => (
+            <div key={id} onClick={() => buscarDirecto(id)}
+              style={{ background: "#12121a", border: "1px solid #1e1e2e", color: "#555570", padding: "6px 14px", ...s, fontSize: 11, cursor: "pointer", borderRadius: 20, letterSpacing: 1 }}>
+              {["BTC", "ETH", "SOL", "ADA", "XRP"][i]}
+            </div>
+          ))}
+        </div>
+
+        {/* Loading */}
+        {loading && (
+          <div style={{ textAlign: "center", padding: 40, color: "#555570", ...s, fontSize: 12, letterSpacing: 2 }}>
+            CARGANDO DATOS...
+          </div>
+        )}
+
+        {/* Error */}
+        {error && (
+          <div style={{ background: "rgba(255,77,109,0.1)", border: "1px solid rgba(255,77,109,0.3)", color: "#ff4d6d", padding: "16px 20px", borderRadius: 6, ...s, fontSize: 12 }}>
+            ⚠ {error}
+          </div>
+        )}
+
+        {/* Results */}
+        {data && !loading && (() => {
+          const rsiInfo = getRsiInfo(data.rsi);
+          const pctB = data.bb ? (data.price - data.bb.lower) / (data.bb.upper - data.bb.lower) : 0.5;
+          const macdBull = data.macd && data.macd.macdLine > data.macd.signal;
+
+          return (
+            <div>
+              {/* Price card */}
+              <div style={{ background: "#12121a", border: "1px solid #1e1e2e", borderRadius: 8, padding: 24, marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
+                  <div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: "#e8e8f0", fontFamily: "sans-serif" }}>{data.name}</div>
+                    <div style={{ ...s, fontSize: 11, color: "#555570", letterSpacing: 2, marginTop: 3 }}>{data.symbol}</div>
+                  </div>
+                </div>
+                <div style={{ ...s, fontSize: 30, fontWeight: 700, color: "#f5c842", marginBottom: 6 }}>{fmt(data.price)}</div>
+                <div style={{ ...s, fontSize: 12, color: data.change24h >= 0 ? "#3dffa0" : "#ff4d6d" }}>
+                  {data.change24h >= 0 ? "+" : ""}{data.change24h?.toFixed(2)}% últimas 24h
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 18 }}>
+                  {[["Máx 24h", fmt(data.high24h)], ["Mín 24h", fmt(data.low24h)], ["Cap. Mercado", fmt(data.marketCap)], ["Volumen 24h", fmt(data.volume24h)]].map(([label, val]) => (
+                    <div key={label} style={{ background: "#0a0a0f", borderRadius: 6, padding: 12 }}>
+                      <div style={{ ...s, fontSize: 9, color: "#555570", letterSpacing: 2, textTransform: "uppercase", marginBottom: 5 }}>{label}</div>
+                      <div style={{ ...s, fontSize: 12, fontWeight: 700, color: "#e8e8f0" }}>{val}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* RSI card */}
+              <div style={{ background: "#12121a", border: "1px solid #1e1e2e", borderRadius: 8, padding: 24, marginBottom: 14 }}>
+                <div style={{ ...s, fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "#555570", marginBottom: 18 }}>◈ RSI — 4H · 14 periodos</div>
+                <div style={{ ...s, fontSize: 48, fontWeight: 700, textAlign: "center", color: rsiInfo.color, marginBottom: 6 }}>{data.rsi.toFixed(1)}</div>
+                <div style={{ textAlign: "center", fontSize: 12, fontWeight: 700, letterSpacing: 2, color: rsiInfo.color, marginBottom: 20, textTransform: "uppercase", fontFamily: "sans-serif" }}>{rsiInfo.label}</div>
+                <div style={{ position: "relative", height: 8, borderRadius: 4, background: "linear-gradient(to right, #3dffa0 0%, #3dffa0 30%, #f5c842 30%, #f5c842 70%, #ff4d6d 70%, #ff4d6d 100%)", marginBottom: 6 }}>
+                  <div style={{ position: "absolute", top: -4, left: `${Math.min(Math.max(data.rsi, 2), 98)}%`, width: 16, height: 16, borderRadius: "50%", background: "white", border: "3px solid #0a0a0f", transform: "translateX(-50%)" }} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", ...s, fontSize: 9, color: "#555570", marginTop: 6 }}>
+                  <span>0</span><span>30</span><span>70</span><span>100</span>
+                </div>
+                <div style={{ marginTop: 16, background: "#0a0a0f", borderRadius: 6, padding: "14px 16px", ...s, fontSize: 11, lineHeight: 1.7, color: "#e8e8f0" }}>
+                  {rsiInfo.text}
+                </div>
+              </div>
+
+              {/* MACD + EMA */}
+              <div style={{ background: "#12121a", border: "1px solid #1e1e2e", borderRadius: 8, padding: 24, marginBottom: 14 }}>
+                <div style={{ ...s, fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "#555570", marginBottom: 18 }}>◈ MACD + EMA 21 — 4H</div>
+
+                {[
+                  { label: "EMA 21", desc: "Media exponencial 21 periodos", val: fmt(data.ema21), bull: data.price > data.ema21, sig: data.price > data.ema21 ? "▲ Por encima — Alcista" : "▼ Por debajo — Bajista" },
+                  { label: "MACD", desc: "12/26/9 · Línea y señal", val: data.macd?.macdLine?.toFixed(4) || "—", bull: macdBull, sig: macdBull ? "▲ Alcista — Momentum positivo" : "▼ Bajista — Momentum negativo" }
+                ].map(({ label, desc, val, bull, sig }) => (
+                  <div key={label} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: 14, borderRadius: 6, marginBottom: 10, background: "#0a0a0f" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ width: 10, height: 10, borderRadius: "50%", background: bull ? "#3dffa0" : "#ff4d6d", boxShadow: `0 0 6px ${bull ? "#3dffa0" : "#ff4d6d"}` }} />
+                      <div>
+                        <div style={{ fontSize: 12, fontWeight: 700, color: "#e8e8f0", fontFamily: "sans-serif" }}>{label}</div>
+                        <div style={{ ...s, fontSize: 10, color: "#555570", marginTop: 2 }}>{desc}</div>
+                      </div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ ...s, fontSize: 12, fontWeight: 700, color: "#e8e8f0" }}>{val}</div>
+                      <div style={{ ...s, fontSize: 10, color: bull ? "#3dffa0" : "#ff4d6d", marginTop: 2 }}>{sig}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Bollinger */}
+              {data.bb && (
+                <div style={{ background: "#12121a", border: "1px solid #1e1e2e", borderRadius: 8, padding: 24, marginBottom: 14 }}>
+                  <div style={{ ...s, fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "#555570", marginBottom: 18 }}>◈ Bandas de Bollinger — 4H</div>
+                  <div style={{ display: "flex", gap: 10, marginBottom: 14, minHeight: 90 }}>
+                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", alignItems: "flex-end", minWidth: 80 }}>
+                      <span style={{ ...s, fontSize: 10, color: "#555570" }}>{fmt(data.bb.upper)}</span>
+                      <span style={{ ...s, fontSize: 10, color: "#f5c842" }}>{fmt(data.bb.mid)}</span>
+                      <span style={{ ...s, fontSize: 10, color: "#555570" }}>{fmt(data.bb.lower)}</span>
+                    </div>
+                    <div style={{ flex: 1, position: "relative", background: "#0a0a0f", borderRadius: 6, overflow: "hidden" }}>
+                      <div style={{ position: "absolute", top: 0, bottom: 0, left: 0, right: 0, background: "rgba(91,141,238,0.12)", borderTop: "1px solid rgba(91,141,238,0.4)", borderBottom: "1px solid rgba(91,141,238,0.4)" }} />
+                      <div style={{ position: "absolute", left: 8, right: 8, height: 3, top: `${((1 - Math.min(Math.max(pctB, 0.02), 0.98)) * 100).toFixed(1)}%`, background: "#f5c842", borderRadius: 2, boxShadow: "0 0 8px #f5c842" }} />
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", justifyContent: "space-between", minWidth: 50 }}>
+                      {["Superior", "Media", "Inferior"].map(l => <span key={l} style={{ ...s, fontSize: 9, color: "#555570" }}>{l}</span>)}
+                    </div>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 14 }}>
+                    <div style={{ background: "#0a0a0f", borderRadius: 6, padding: 12 }}>
+                      <div style={{ ...s, fontSize: 9, color: "#555570", letterSpacing: 2, textTransform: "uppercase", marginBottom: 5 }}>%B Posición</div>
+                      <div style={{ ...s, fontSize: 12, fontWeight: 700, color: pctB < 0.2 ? "#3dffa0" : pctB > 0.8 ? "#ff4d6d" : "#f5c842" }}>{(pctB * 100).toFixed(1)}%</div>
+                    </div>
+                    <div style={{ background: "#0a0a0f", borderRadius: 6, padding: 12 }}>
+                      <div style={{ ...s, fontSize: 9, color: "#555570", letterSpacing: 2, textTransform: "uppercase", marginBottom: 5 }}>Anchura</div>
+                      <div style={{ ...s, fontSize: 12, fontWeight: 700, color: "#e8e8f0" }}>{(((data.bb.upper - data.bb.lower) / data.bb.mid) * 100).toFixed(2)}%</div>
+                    </div>
+                  </div>
+                  <div style={{ background: "#0a0a0f", borderRadius: 6, padding: "14px 16px", ...s, fontSize: 11, lineHeight: 1.7, color: "#e8e8f0" }}>
+                    {pctB < 0.2 ? "Precio en la parte baja de las bandas. Posible oportunidad de entrada."
+                      : pctB > 0.8 ? "Precio en la parte alta. Puede estar sobreextendido. No es buen momento de compra."
+                      : "Precio en zona media de las bandas. Sin señal extrema. Espera que el precio se acerque a alguna banda."}
+                  </div>
+                </div>
+              )}
+
+              {/* DCA Levels */}
+              <div style={{ background: "#12121a", border: "1px solid #1e1e2e", borderRadius: 8, padding: 24, marginBottom: 14 }}>
+                <div style={{ ...s, fontSize: 10, letterSpacing: 3, textTransform: "uppercase", color: "#555570", marginBottom: 18 }}>◈ Niveles de Entrada</div>
+                {[
+                  { label: "DCA 1", sub: "1ª zona de compra", val: data.levels.dca1, color: "#5b8dee" },
+                  { label: "DCA 2", sub: "2ª zona de compra", val: data.levels.dca2, color: "#4a7bd4" },
+                  { label: "DCA 3", sub: "3ª zona de compra", val: data.levels.dca3, color: "#3a6bc4" },
+                ].map(({ label, sub, val, color }) => (
+                  <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "12px 14px", borderRadius: 6, marginBottom: 8, borderLeft: `3px solid ${color}`, background: "rgba(93,141,238,0.06)" }}>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#e8e8f0", fontFamily: "sans-serif" }}>{label}</div>
+                      <div style={{ ...s, fontSize: 10, color: "#555570", marginTop: 2 }}>{sub}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ ...s, fontSize: 13, fontWeight: 700, color: "#e8e8f0" }}>{fmt(val)}</div>
+                      <div style={{ ...s, fontSize: 10, color: "#555570", marginTop: 2 }}>{pct(data.price, val)}</div>
+                    </div>
+                  </div>
+                ))}
+                <div style={{ borderTop: "1px solid #1e1e2e", margin: "12px 0" }} />
+                {[
+                  { label: "Take Profit", sub: "Objetivo de ganancia", val: data.levels.tp, color: "#3dffa0", bg: "rgba(61,255,160,0.06)" },
+                  { label: "Stop Loss", sub: "Límite de pérdida", val: data.levels.sl, color: "#ff4d6d", bg: "rgba(255,77,109,0.06)" },
+                ].map(({ label, sub, val, color, bg }) => (
+                  <div key={label} style={{ display: "flex", justifyContent: "space-between", padding: "12px 14px", borderRadius: 6, marginBottom: 8, borderLeft: `3px solid ${color}`, background: bg }}>
+                    <div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: "#e8e8f0", fontFamily: "sans-serif" }}>{label}</div>
+                      <div style={{ ...s, fontSize: 10, color: "#555570", marginTop: 2 }}>{sub}</div>
+                    </div>
+                    <div style={{ textAlign: "right" }}>
+                      <div style={{ ...s, fontSize: 13, fontWeight: 700, color: "#e8e8f0" }}>{fmt(val)}</div>
+                      <div style={{ ...s, fontSize: 10, color: "#555570", marginTop: 2 }}>{pct(data.price, val)}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ ...s, fontSize: 10, color: "#555570", textAlign: "
