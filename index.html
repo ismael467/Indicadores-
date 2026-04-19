@@ -347,6 +347,7 @@ async function fetchCoin(symbol) {
   document.getElementById('btn').disabled = true;
   show('loading');
   try {
-    const BASE = 'https://api.binance.com/api/v3';
-    // Precio actual + 24h stats
-    const [r1, r2] = aw
+    const base = 'https://min-api.cryptocompare.com/data';
+    const coin = symbol.replace('USDT','');
+
+   
