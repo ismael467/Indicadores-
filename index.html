@@ -7,50 +7,24 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #0a0a0f;
-    --card: #12121a;
-    --border: #1e1e2e;
-    --yellow: #f5c842;
-    --green: #3dffa0;
-    --red: #ff4d6d;
-    --blue: #5b8dee;
-    --orange: #ff9f43;
-    --text: #e8e8f0;
-    --muted: #555570;
+    --bg: #0a0a0f; --card: #12121a; --border: #1e1e2e;
+    --yellow: #f5c842; --green: #3dffa0; --red: #ff4d6d;
+    --blue: #5b8dee; --text: #e8e8f0; --muted: #555570;
   }
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: var(--bg); color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh; display: flex;
-    align-items: flex-start; justify-content: center;
-    padding: 28px 16px;
-  }
+  body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 28px 16px; }
   .container { width: 100%; max-width: 420px; }
   h1 { font-size: 11px; letter-spacing: 4px; text-transform: uppercase; color: var(--muted); margin-bottom: 28px; font-family: 'Space Mono', monospace; }
   h1 span { color: var(--yellow); }
   .search-box { display: flex; gap: 10px; margin-bottom: 16px; }
-  input {
-    flex: 1; background: var(--card); border: 1px solid var(--border);
-    color: var(--text); padding: 14px 18px; font-family: 'Space Mono', monospace;
-    font-size: 16px; text-transform: uppercase; outline: none; border-radius: 4px;
-    transition: border-color 0.2s; letter-spacing: 2px;
-  }
+  input { flex: 1; background: var(--card); border: 1px solid var(--border); color: var(--text); padding: 14px 18px; font-family: 'Space Mono', monospace; font-size: 16px; text-transform: uppercase; outline: none; border-radius: 4px; transition: border-color 0.2s; letter-spacing: 2px; }
   input:focus { border-color: var(--yellow); }
   input::placeholder { color: var(--muted); font-size: 12px; letter-spacing: 1px; }
-  button {
-    background: var(--yellow); color: #0a0a0f; border: none;
-    padding: 14px 20px; font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: 13px; cursor: pointer; border-radius: 4px; transition: opacity 0.2s;
-  }
+  button { background: var(--yellow); color: #0a0a0f; border: none; padding: 14px 20px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 13px; cursor: pointer; border-radius: 4px; transition: opacity 0.2s; }
   button:hover { opacity: 0.85; }
   button:disabled { opacity: 0.4; cursor: not-allowed; }
   .chips { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 24px; }
-  .chip {
-    background: var(--card); border: 1px solid var(--border); color: var(--muted);
-    padding: 6px 14px; font-family: 'Space Mono', monospace; font-size: 11px;
-    cursor: pointer; border-radius: 20px; transition: all 0.2s; letter-spacing: 1px;
-  }
+  .chip { background: var(--card); border: 1px solid var(--border); color: var(--muted); padding: 6px 14px; font-family: 'Space Mono', monospace; font-size: 11px; cursor: pointer; border-radius: 20px; transition: all 0.2s; letter-spacing: 1px; }
   .chip:hover { border-color: var(--yellow); color: var(--yellow); }
   .loading { text-align: center; padding: 40px; color: var(--muted); font-family: 'Space Mono', monospace; font-size: 12px; display: none; letter-spacing: 2px; }
   .loading.visible { display: block; }
@@ -58,7 +32,7 @@
   .dot:nth-child(2) { animation-delay: 0.2s; }
   .dot:nth-child(3) { animation-delay: 0.4s; }
   @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
-  .error { background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.3); color: var(--red); padding: 16px 20px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 12px; display: none; }
+  .error { background: rgba(255,77,109,0.1); border: 1px solid rgba(255,77,109,0.3); color: var(--red); padding: 16px 20px; border-radius: 6px; font-family: 'Space Mono', monospace; font-size: 12px; display: none; line-height: 1.6; }
   .error.visible { display: block; }
   .result { display: none; animation: fadeIn 0.3s ease; }
   .result.visible { display: block; }
@@ -71,7 +45,6 @@
   .coin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
   .coin-name { font-size: 20px; font-weight: 800; }
   .coin-symbol { font-family: 'Space Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 2px; margin-top: 3px; }
-  .coin-img { width: 44px; height: 44px; border-radius: 50%; }
   .price-big { font-family: 'Space Mono', monospace; font-size: 30px; font-weight: 700; color: var(--yellow); margin-bottom: 6px; }
   .change { font-family: 'Space Mono', monospace; font-size: 12px; }
   .change.up { color: var(--green); }
@@ -97,11 +70,7 @@
   .signal-box strong { color: var(--yellow); }
 
   /* MACD + EMA */
-  .indicator-row {
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 14px; border-radius: 6px; margin-bottom: 10px;
-    background: var(--bg);
-  }
+  .indicator-row { display: flex; align-items: center; justify-content: space-between; padding: 14px; border-radius: 6px; margin-bottom: 10px; background: var(--bg); }
   .ind-left { display: flex; align-items: center; gap: 12px; }
   .ind-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
   .ind-dot.green { background: var(--green); box-shadow: 0 0 6px var(--green); }
@@ -115,19 +84,14 @@
   .ind-signal.red { color: var(--red); }
   .ind-signal.yellow { color: var(--yellow); }
 
-  /* Bollinger Bands */
+  /* Bollinger */
   .bb-visual { display: flex; align-items: stretch; gap: 10px; margin-bottom: 14px; min-height: 90px; }
   .bb-labels { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; min-width: 80px; }
   .bb-tag { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); }
   .bb-tag.mid { color: var(--yellow); }
   .bb-track { flex: 1; position: relative; background: var(--bg); border-radius: 6px; overflow: hidden; }
   .bb-band-area { position: absolute; left: 0; right: 0; background: rgba(91,141,238,0.12); border-top: 1px solid rgba(91,141,238,0.4); border-bottom: 1px solid rgba(91,141,238,0.4); }
-  .bb-price-marker {
-    position: absolute; left: 8px; right: 8px; height: 3px;
-    background: var(--yellow); border-radius: 2px;
-    box-shadow: 0 0 8px var(--yellow);
-    transition: top 0.4s ease;
-  }
+  .bb-price-marker { position: absolute; left: 8px; right: 8px; height: 3px; background: var(--yellow); border-radius: 2px; box-shadow: 0 0 8px var(--yellow); transition: top 0.4s ease; }
   .bb-side-labels { display: flex; flex-direction: column; justify-content: space-between; min-width: 50px; }
   .bb-side-labels span { font-family: 'Space Mono', monospace; font-size: 9px; color: var(--muted); letter-spacing: 1px; }
   .bb-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
@@ -145,7 +109,6 @@
   .lvl-tp { background: rgba(61,255,160,0.08); border-left-color: var(--green); }
   .lvl-sl { background: rgba(255,77,109,0.08); border-left-color: var(--red); }
   .divider { border: none; border-top: 1px solid var(--border); margin: 12px 0; }
-
   .updated { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); margin-top: 4px; letter-spacing: 1px; text-align: right; }
   .note { font-family: 'Space Mono', monospace; font-size: 10px; color: var(--muted); text-align: center; margin-top: 10px; line-height: 1.6; padding-bottom: 20px; }
 </style>
@@ -160,11 +123,11 @@
   </div>
 
   <div class="chips">
-    <div class="chip" onclick="buscarDirecto('bitcoin')">BTC</div>
-    <div class="chip" onclick="buscarDirecto('ethereum')">ETH</div>
-    <div class="chip" onclick="buscarDirecto('solana')">SOL</div>
-    <div class="chip" onclick="buscarDirecto('cardano')">ADA</div>
-    <div class="chip" onclick="buscarDirecto('ripple')">XRP</div>
+    <div class="chip" onclick="buscarSimbolo('BTCUSDT')">BTC</div>
+    <div class="chip" onclick="buscarSimbolo('ETHUSDT')">ETH</div>
+    <div class="chip" onclick="buscarSimbolo('SOLUSDT')">SOL</div>
+    <div class="chip" onclick="buscarSimbolo('ADAUSDT')">ADA</div>
+    <div class="chip" onclick="buscarSimbolo('XRPUSDT')">XRP</div>
   </div>
 
   <div class="loading" id="loading">BUSCANDO<span class="dot">.</span><span class="dot">.</span><span class="dot">.</span></div>
@@ -179,15 +142,14 @@
           <div class="coin-name" id="coin-name">—</div>
           <div class="coin-symbol" id="coin-symbol">—</div>
         </div>
-        <img class="coin-img" id="coin-img" src="" alt="" onerror="this.style.display='none'" />
       </div>
       <div class="price-big" id="price">—</div>
       <div class="change" id="change">—</div>
       <div class="mini-stats">
         <div class="mini-stat"><div class="mini-label">Máx 24h</div><div class="mini-value" id="high">—</div></div>
         <div class="mini-stat"><div class="mini-label">Mín 24h</div><div class="mini-value" id="low">—</div></div>
-        <div class="mini-stat"><div class="mini-label">Cap. Mercado</div><div class="mini-value" id="mcap">—</div></div>
         <div class="mini-stat"><div class="mini-label">Volumen 24h</div><div class="mini-value" id="vol">—</div></div>
+        <div class="mini-stat"><div class="mini-label">Fuente</div><div class="mini-value" style="color:var(--muted);font-size:10px">Binance</div></div>
       </div>
     </div>
 
@@ -206,42 +168,26 @@
     <!-- MACD + EMA21 -->
     <div class="card">
       <div class="section-title">◈ MACD + EMA 21 — 4H</div>
-
       <div class="indicator-row">
         <div class="ind-left">
           <div class="ind-dot" id="ema-dot"></div>
-          <div>
-            <div class="ind-name">EMA 21</div>
-            <div class="ind-desc">Media exponencial 21 periodos</div>
-          </div>
+          <div><div class="ind-name">EMA 21</div><div class="ind-desc">Media exponencial 21 periodos</div></div>
         </div>
-        <div>
-          <div class="ind-value" id="ema-val">—</div>
-          <div class="ind-signal" id="ema-sig">—</div>
-        </div>
+        <div><div class="ind-value" id="ema-val">—</div><div class="ind-signal" id="ema-sig">—</div></div>
       </div>
-
       <div class="indicator-row">
         <div class="ind-left">
           <div class="ind-dot" id="macd-dot"></div>
-          <div>
-            <div class="ind-name">MACD</div>
-            <div class="ind-desc">12/26/9 · Línea y señal</div>
-          </div>
+          <div><div class="ind-name">MACD</div><div class="ind-desc">12/26/9 · Línea y señal</div></div>
         </div>
-        <div>
-          <div class="ind-value" id="macd-val">—</div>
-          <div class="ind-signal" id="macd-sig">—</div>
-        </div>
+        <div><div class="ind-value" id="macd-val">—</div><div class="ind-signal" id="macd-sig">—</div></div>
       </div>
-
       <div class="signal-box" id="macd-explain">—</div>
     </div>
 
     <!-- Bollinger Bands -->
     <div class="card">
       <div class="section-title">◈ Bandas de Bollinger — 4H · 20 periodos</div>
-
       <div class="bb-visual">
         <div class="bb-labels">
           <span class="bb-tag" id="bb-upper-tag">—</span>
@@ -253,23 +199,13 @@
           <div class="bb-price-marker" id="bb-marker"></div>
         </div>
         <div class="bb-side-labels">
-          <span>Superior</span>
-          <span>Media</span>
-          <span>Inferior</span>
+          <span>Superior</span><span>Media</span><span>Inferior</span>
         </div>
       </div>
-
       <div class="bb-stats">
-        <div class="bb-stat">
-          <div class="mini-label">%B (posición)</div>
-          <div class="mini-value" id="bb-pct">—</div>
-        </div>
-        <div class="bb-stat">
-          <div class="mini-label">Anchura</div>
-          <div class="mini-value" id="bb-width">—</div>
-        </div>
+        <div class="bb-stat"><div class="mini-label">%B (posición)</div><div class="mini-value" id="bb-pct">—</div></div>
+        <div class="bb-stat"><div class="mini-label">Anchura</div><div class="mini-value" id="bb-width">—</div></div>
       </div>
-
       <div class="signal-box" id="bb-signal">—</div>
     </div>
 
@@ -305,12 +241,19 @@
 </div>
 
 <script>
-const tickerToId = {
-  'BTC':'bitcoin','ETH':'ethereum','SOL':'solana','ADA':'cardano',
-  'XRP':'ripple','BNB':'binancecoin','DOGE':'dogecoin','DOT':'polkadot',
-  'MATIC':'matic-network','LINK':'chainlink','AVAX':'avalanche-2',
-  'SHIB':'shiba-inu','LTC':'litecoin','UNI':'uniswap','ATOM':'cosmos',
-  'TRX':'tron','TON':'the-open-network','SUI':'sui','APT':'aptos','NEAR':'near'
+const tickerToSymbol = {
+  'BTC':'BTCUSDT','ETH':'ETHUSDT','SOL':'SOLUSDT','ADA':'ADAUSDT',
+  'XRP':'XRPUSDT','BNB':'BNBUSDT','DOGE':'DOGEUSDT','DOT':'DOTUSDT',
+  'MATIC':'MATICUSDT','LINK':'LINKUSDT','AVAX':'AVAXUSDT',
+  'SHIB':'SHIBUSDT','LTC':'LTCUSDT','UNI':'UNIUSDT','ATOM':'ATOMUSDT',
+  'TRX':'TRXUSDT','TON':'TONUSDT','SUI':'SUIUSDT','APT':'APTUSDT','NEAR':'NEARUSDT'
+};
+const symbolToName = {
+  'BTCUSDT':'Bitcoin','ETHUSDT':'Ethereum','SOLUSDT':'Solana','ADAUSDT':'Cardano',
+  'XRPUSDT':'XRP','BNBUSDT':'BNB','DOGEUSDT':'Dogecoin','DOTUSDT':'Polkadot',
+  'MATICUSDT':'Polygon','LINKUSDT':'Chainlink','AVAXUSDT':'Avalanche',
+  'SHIBUSDT':'Shiba Inu','LTCUSDT':'Litecoin','UNIUSDT':'Uniswap','ATOMUSDT':'Cosmos',
+  'TRXUSDT':'TRON','TONUSDT':'TON','SUIUSDT':'Sui','APTUSDT':'Aptos','NEARUSDT':'NEAR'
 };
 
 function fmt(n) {
@@ -329,19 +272,19 @@ function show(id) {
   document.getElementById(id).classList.add('visible');
 }
 
-// ── RSI (Wilder, 14 periodos) ──
-function calcRSI(prices, period = 14) {
-  if (prices.length < period + 1) return null;
+// ── RSI Wilder 14 ──
+function calcRSI(closes, period = 14) {
+  if (closes.length < period + 1) return null;
   let gains = 0, losses = 0;
   for (let i = 1; i <= period; i++) {
-    const d = prices[i] - prices[i-1];
+    const d = closes[i] - closes[i-1];
     if (d >= 0) gains += d; else losses -= d;
   }
   let ag = gains / period, al = losses / period;
-  for (let i = period + 1; i < prices.length; i++) {
-    const d = prices[i] - prices[i-1];
-    ag = (ag * (period-1) + Math.max(d,0)) / period;
-    al = (al * (period-1) + Math.max(-d,0)) / period;
+  for (let i = period + 1; i < closes.length; i++) {
+    const d = closes[i] - closes[i-1];
+    ag = (ag*(period-1) + Math.max(d,0)) / period;
+    al = (al*(period-1) + Math.max(-d,0)) / period;
   }
   if (al === 0) return 100;
   return 100 - (100 / (1 + ag/al));
@@ -352,59 +295,58 @@ function calcEMA(prices, period) {
   if (prices.length < period) return null;
   const k = 2 / (period + 1);
   let ema = prices.slice(0, period).reduce((a,b) => a+b, 0) / period;
-  for (let i = period; i < prices.length; i++) {
-    ema = prices[i] * k + ema * (1 - k);
-  }
+  for (let i = period; i < prices.length; i++) ema = prices[i]*k + ema*(1-k);
   return ema;
 }
 
-// ── MACD (12, 26, 9) ──
+// ── MACD 12/26/9 ──
 function calcMACD(prices) {
   if (prices.length < 35) return null;
-  const ema12 = calcEMA(prices, 12);
-  const ema26 = calcEMA(prices, 26);
-  if (!ema12 || !ema26) return null;
-  const macdLine = ema12 - ema26;
-
-  // Calcular línea MACD histórica para la señal (9 periodos EMA del MACD)
   const macdHistory = [];
   for (let i = 26; i <= prices.length; i++) {
-    const e12 = calcEMA(prices.slice(0, i), 12);
-    const e26 = calcEMA(prices.slice(0, i), 26);
+    const e12 = calcEMA(prices.slice(0,i), 12);
+    const e26 = calcEMA(prices.slice(0,i), 26);
     if (e12 && e26) macdHistory.push(e12 - e26);
   }
+  const macdLine = macdHistory[macdHistory.length - 1];
   const signal = calcEMA(macdHistory, 9);
-  const histogram = macdLine - (signal || 0);
-  return { macdLine, signal, histogram };
+  return { macdLine, signal, histogram: macdLine - (signal||0) };
 }
 
-// ── Bollinger Bands (20 periodos, 2 desviaciones) ──
+// ── Bollinger Bands 20/2 ──
 function calcBB(prices, period = 20, mult = 2) {
   if (prices.length < period) return null;
   const slice = prices.slice(-period);
   const mid = slice.reduce((a,b) => a+b, 0) / period;
-  const variance = slice.reduce((a,b) => a + Math.pow(b - mid, 2), 0) / period;
-  const std = Math.sqrt(variance);
-  return { upper: mid + mult*std, mid, lower: mid - mult*std, std };
+  const std = Math.sqrt(slice.reduce((a,b) => a + Math.pow(b-mid,2), 0) / period);
+  return { upper: mid+mult*std, mid, lower: mid-mult*std };
 }
 
 function getRsiInfo(rsi) {
-  if (rsi <= 30) return { clase: 'sobrevendido', label: 'Sobrevendido', signal: `RSI en zona de <strong>sobrevendido</strong>. El precio ha caído mucho. Posible rebote. Buena zona para DCA.` };
-  if (rsi <= 45) return { clase: 'sobrevendido', label: 'Debilidad', signal: `RSI en zona de <strong>debilidad</strong>. Mercado bajista pero sin llegar a extremos. DCA 1 puede ser interesante.` };
-  if (rsi <= 55) return { clase: 'neutro', label: 'Neutro', signal: `RSI en zona <strong>neutral</strong>. Sin señal clara. Espera confirmación antes de entrar.` };
-  if (rsi <= 70) return { clase: 'neutro', label: 'Fuerza', signal: `RSI en zona de <strong>fuerza</strong>. Momentum alcista. Cuidado con entrar tarde en el movimiento.` };
-  return { clase: 'sobrecomprado', label: 'Sobrecomprado', signal: `RSI en zona de <strong>sobrecomprado</strong>. Precio muy alto. <strong>No es buen momento de compra.</strong> Espera corrección.` };
+  if (rsi <= 30) return { clase:'sobrevendido', label:'Sobrevendido', signal:`RSI en zona de <strong>sobrevendido</strong>. El precio ha caído mucho. Posible rebote. Buena zona para DCA.` };
+  if (rsi <= 45) return { clase:'sobrevendido', label:'Debilidad', signal:`RSI en zona de <strong>debilidad</strong>. Mercado bajista pero sin llegar a extremos. DCA 1 puede ser interesante.` };
+  if (rsi <= 55) return { clase:'neutro', label:'Neutro', signal:`RSI en zona <strong>neutral</strong>. Sin señal clara. Espera confirmación antes de entrar.` };
+  if (rsi <= 70) return { clase:'neutro', label:'Fuerza', signal:`RSI en zona de <strong>fuerza</strong>. Momentum alcista. Cuidado con entrar tarde.` };
+  return { clase:'sobrecomprado', label:'Sobrecomprado', signal:`RSI en zona de <strong>sobrecomprado</strong>. <strong>No es buen momento de compra.</strong> Espera corrección.` };
 }
 
 function calcLevels(price, rsi) {
   const f = rsi <= 30 ? 0.92 : rsi <= 50 ? 0.88 : 0.85;
-  return {
-    dca1: price * f,
-    dca2: price * f * 0.88,
-    dca3: price * f * 0.76,
-    tp:   price * (rsi <= 40 ? 1.25 : 1.18),
-    sl:   price * (rsi <= 40 ? 0.82 : 0.80)
-  };
+  return { dca1:price*f, dca2:price*f*0.88, dca3:price*f*0.76, tp:price*(rsi<=40?1.25:1.18), sl:price*(rsi<=40?0.82:0.80) };
 }
 
-async function buscarDirecto(coinId
+async function buscarSimbolo(symbol) { await fetchCoin(symbol); }
+async function buscar() {
+  const raw = document.getElementById('ticker').value.trim().toUpperCase();
+  if (!raw) return;
+  const symbol = tickerToSymbol[raw] || (raw + 'USDT');
+  await fetchCoin(symbol);
+}
+
+async function fetchCoin(symbol) {
+  document.getElementById('btn').disabled = true;
+  show('loading');
+  try {
+    const BASE = 'https://api.binance.com/api/v3';
+    // Precio actual + 24h stats
+    const [r1, r2] = aw
