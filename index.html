@@ -347,7 +347,7 @@ async function fetchCoin(symbol) {
   document.getElementById('btn').disabled = true;
   show('loading');
   try {
-    const base = 'https://min-api.cryptocompare.com/data';
     const coin = symbol.replace('USDT','');
 
-   
+    // Coinbase API - gratuita, sin API key, permite CORS
+    
